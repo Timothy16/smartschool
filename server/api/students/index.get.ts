@@ -4,7 +4,7 @@ import { ensureConnection } from '~/utils/mongodb';
 export default defineEventHandler(async (event) => {
   try {
     await ensureConnection();
-     await import('~/models/Student.model');
+     await import('~/models/Class.model');
     requireRole(event, 'Admin')
 
     const students = await Student.find()
