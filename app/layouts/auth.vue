@@ -1,5 +1,5 @@
 <template>
-  <div class="relative min-h-screen flex items-center justify-center overflow-hidden bg-page p-4">
+  <div class="relative  min-h-screen flex items-center justify-center overflow-hidden bg-page p-4">
     <!-- Ambient gradient background: brand-only, kept quiet - status colours are never decorative -->
     <div class="pointer-events-none absolute inset-0 -z-10">
       <div class="absolute -top-40 -left-32 size-[28rem] rounded-full bg-brand-500/25 blur-3xl" />
