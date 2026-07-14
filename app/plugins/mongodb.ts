@@ -17,3 +17,4 @@ export default defineNuxtPlugin(async () => {
     console.log('Client-side code, MongoDB connection skipped')
   }
 })
+
