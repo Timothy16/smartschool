@@ -32,5 +32,16 @@ export default defineNuxtConfig({
     public: {
       appUrl: process.env.APP_URL || 'http://localhost:3000'
     }
-  }
+  },
+   mongoose: {
+    uri: process.env.MONGODB_URI,
+    options: {
+      // dbName: 'myschool',
+      serverSelectionTimeoutMS: 30000,
+      connectTimeoutMS: 30000,
+      socketTimeoutMS: 30000,
+      retryWrites: true,
+      w: 'majority'
+    },
+  },
 })
