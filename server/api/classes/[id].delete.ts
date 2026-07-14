@@ -1,8 +1,10 @@
 import { Class } from '~/models/Class.model'
 import { Assignment } from '~/models/Assignment.model'
+import { ensureConnection } from '~/utils/mongodb';
 
 export default defineEventHandler(async (event) => {
   try {
+    await ensureConnection();
     requireRole(event, 'Admin')
 
     const id = getRouterParam(event, 'id')

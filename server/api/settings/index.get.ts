@@ -1,5 +1,8 @@
+import { ensureConnection } from '~/utils/mongodb';
+
 export default defineEventHandler(async (event) => {
   try {
+    await ensureConnection();
     requireRole(event, 'Admin')
 
     const settings = await getOrCreateSettings()

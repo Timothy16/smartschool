@@ -1,7 +1,10 @@
+import { ensureConnection } from '~/utils/mongodb';
+
 const VALID_TERMS = ['First', 'Second', 'Third']
 
 export default defineEventHandler(async (event) => {
   try {
+     await ensureConnection();
     requireRole(event, 'Admin')
 
     const body = await readBody(event)

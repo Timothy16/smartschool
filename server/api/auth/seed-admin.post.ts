@@ -1,5 +1,6 @@
 import { timingSafeEqual } from 'node:crypto'
 import { Admin } from '~/models/Admin.model'
+import { ensureConnection } from '~/utils/mongodb';
 
 function secretsMatch(a: string, b: string): boolean {
   const bufA = Buffer.from(a)
@@ -14,6 +15,7 @@ function secretsMatch(a: string, b: string): boolean {
  */
 export default defineEventHandler(async (event) => {
   try {
+    await ensureConnection();
     const { seedSecret } = useRuntimeConfig()
     const providedSecret = getHeader(event, 'x-seed-secret') || ''
 

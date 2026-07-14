@@ -1,8 +1,10 @@
 import { Student } from '~/models/Student.model'
 import { Class } from '~/models/Class.model'
+import { ensureConnection } from '~/utils/mongodb';
 
 export default defineEventHandler(async (event) => {
   try {
+    await ensureConnection();
     requireRole(event, 'Admin')
 
     const body = await readBody(event)

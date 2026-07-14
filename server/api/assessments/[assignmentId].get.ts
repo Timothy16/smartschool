@@ -1,9 +1,11 @@
 import { Assignment } from '~/models/Assignment.model'
 import { Student } from '~/models/Student.model'
 import { Assessment } from '~/models/Assessment.model'
+import { ensureConnection } from '~/utils/mongodb';
 
 export default defineEventHandler(async (event) => {
   try {
+     await ensureConnection();
     const session = requireRole(event, 'Teacher')
     const assignmentId = getRouterParam(event, 'assignmentId')
 

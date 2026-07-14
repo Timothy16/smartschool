@@ -3,6 +3,7 @@ import { Admin } from '~/models/Admin.model'
 import { Teacher } from '~/models/Teacher.model'
 import { Student } from '~/models/Student.model'
 import type { UserModel } from '../../utils/session'
+import { ensureConnection } from '~/utils/mongodb';
 
 const MODELS: { name: UserModel; model: mongoose.Model<any> }[] = [
   { name: 'Admin', model: Admin },
@@ -12,6 +13,7 @@ const MODELS: { name: UserModel; model: mongoose.Model<any> }[] = [
 
 export default defineEventHandler(async (event) => {
   try {
+     await ensureConnection();
     const body = await readBody(event)
     const email = typeof body?.email === 'string' ? body.email.trim().toLowerCase() : ''
     const password = typeof body?.password === 'string' ? body.password : ''

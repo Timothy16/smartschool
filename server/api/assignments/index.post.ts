@@ -2,9 +2,11 @@ import { Assignment } from '~/models/Assignment.model'
 import { Teacher } from '~/models/Teacher.model'
 import { Class } from '~/models/Class.model'
 import { Subject } from '~/models/Subject.model'
+import { ensureConnection } from '~/utils/mongodb';
 
 export default defineEventHandler(async (event) => {
   try {
+    await ensureConnection();
     requireRole(event, 'Admin')
 
     const body = await readBody(event)

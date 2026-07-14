@@ -3,6 +3,8 @@ import { Admin } from '~/models/Admin.model'
 import { Teacher } from '~/models/Teacher.model'
 import { Student } from '~/models/Student.model'
 import type { UserModel } from '../../utils/session'
+import { ensureConnection } from '~/utils/mongodb';
+
 
 const MODELS: Record<UserModel, mongoose.Model<any>> = {
   Admin,
@@ -12,6 +14,7 @@ const MODELS: Record<UserModel, mongoose.Model<any>> = {
 
 export default defineEventHandler(async (event) => {
   try {
+     await ensureConnection();
     const session = getUserSession(event)
     if (!session) {
       return { success: true, user: null }
