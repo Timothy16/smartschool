@@ -1,0 +1,29 @@
+{
+  "name": "smartschool",
+  "type": "module",
+  "private": true,
+  "scripts": {
+    "build": "nuxt build",
+    "dev": "nuxt dev",
+    "generate": "nuxt generate",
+    "preview": "nuxt preview",
+    "postinstall": "nuxt prepare"
+  },
+  "dependencies": {
+    "@nuxt/icon": "^2.3.1",
+    "@nuxtjs/color-mode": "^4.0.1",
+    "@pinia/nuxt": "^0.11.3",
+    "@tailwindcss/vite": "^4.3.2",
+    "bcryptjs": "^3.0.3",
+    "mongoose": "^8.18.2",
+    "nuxt": "^4.4.8",
+    "pinia": "^3.0.4",
+    "tailwindcss": "^4.3.2",
+    "vue": "^3.5.39",
+    "vue-router": "^5.1.0"
+  },
+  "devDependencies": {
+    "@iconify-json/lucide": "^1.2.117",
+    "@types/node": "^26.1.1"
+  }
+}
