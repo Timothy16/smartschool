@@ -23,6 +23,8 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, message: 'That class could not be found.' })
     }
 
+    if (email) await assertEmailAvailableAcrossRoles(email, 'Student')
+
     const created = await Student.create({ firstName, lastName, email, password, admissionNumber, classId })
     const { password: _omit, ...student } = created.toObject()
 

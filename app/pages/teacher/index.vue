@@ -21,25 +21,22 @@ const assignments = computed(() => data.value?.assignments ?? [])
     </AppCard>
 
     <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-      <NuxtLink
-        v-for="row in assignments"
-        :key="row._id"
-        :to="`/teacher/scores/${row._id}`"
-        class="transition-transform hover:-translate-y-0.5"
-      >
-        <AppCard class="h-full">
-          <div class="flex items-start justify-between gap-3">
-            <div>
-              <p class="font-semibold text-ink-heading">{{ row.subjectId?.name }}</p>
-              <p class="text-sm text-ink-muted mt-0.5">{{ row.classId?.name }} &middot; {{ row.classId?.session }}</p>
-            </div>
-            <div class="flex items-center justify-center size-9 rounded-lg bg-brand-50 ring-1 ring-brand-600/20 dark:bg-brand-900/40 shrink-0">
-              <Icon name="lucide:pencil-line" class="size-4 text-brand-600 dark:text-brand-400" />
-            </div>
+      <AppCard v-for="row in assignments" :key="row._id">
+        <div class="flex items-start justify-between gap-3">
+          <div>
+            <p class="font-semibold text-ink-heading">{{ row.subjectId?.name }}</p>
+            <p class="text-sm text-ink-muted mt-0.5">{{ row.classId?.name }} &middot; {{ row.classId?.session }}</p>
           </div>
-          <AppBadge class="mt-3 font-mono">{{ row.subjectId?.code }}</AppBadge>
-        </AppCard>
-      </NuxtLink>
+          <div class="flex items-center justify-center size-9 rounded-lg bg-brand-50 ring-1 ring-brand-600/20 dark:bg-brand-900/40 shrink-0">
+            <Icon name="lucide:pencil-line" class="size-4 text-brand-600 dark:text-brand-400" />
+          </div>
+        </div>
+        <AppBadge class="mt-3 font-mono">{{ row.subjectId?.code }}</AppBadge>
+        <div class="flex gap-2 mt-4">
+          <AppButton :to="`/teacher/scores/${row._id}`" size="sm" variant="soft" icon="lucide:pencil-line" block>Scores</AppButton>
+          <AppButton :to="`/teacher/analytics/${row._id}`" size="sm" variant="outline" icon="lucide:activity" block>Analytics</AppButton>
+        </div>
+      </AppCard>
     </div>
   </div>
 </template>

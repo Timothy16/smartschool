@@ -145,6 +145,9 @@ async function handleDelete() {
               </td>
               <td class="px-5 py-3">
                 <div class="flex justify-end gap-1">
+                  <NuxtLink :to="`/admin/results/${row._id}`" class="p-1.5 rounded-md text-ink-muted hover:bg-muted">
+                    <Icon name="lucide:file-text" class="size-4" />
+                  </NuxtLink>
                   <button type="button" class="p-1.5 rounded-md text-ink-muted hover:bg-muted" @click="openEdit(row)">
                     <Icon name="lucide:pencil" class="size-4" />
                   </button>

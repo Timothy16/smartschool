@@ -5,14 +5,21 @@ definePageMeta({ layout: 'default', role: 'Admin' })
 
 const auth = useAuthStore()
 
-const [{ data: studentsData }, { data: teachersData }, { data: classesData }, { data: subjectsData }, { data: settingsData }] =
+const [{ data: studentsData }, { data: teachersData }, { data: classesData }, { data: subjectsData }, { data: settingsData }, { data: analyticsData }] =
   await Promise.all([
     useFetch('/api/students'),
     useFetch('/api/teachers'),
     useFetch('/api/classes'),
     useFetch('/api/subjects'),
-    useFetch('/api/settings')
+    useFetch('/api/settings'),
+    useFetch('/api/analytics/school')
   ])
+
+const flaggedPreview = computed(() => (analyticsData.value?.flagged ?? []).slice(0, 5))
+const STATUS_META: Record<string, { label: string; color: 'danger' | 'warning' }> = {
+  'at-risk': { label: 'At Risk', color: 'danger' },
+  declining: { label: 'Declining', color: 'warning' }
+}
 
 const stats = computed(() => [
   { label: 'Students', value: studentsData.value?.students?.length ?? 0, icon: 'lucide:users', to: '/admin/students', color: 'brand' as UiColor },
@@ -68,6 +75,42 @@ const settings = computed(() => settingsData.value?.settings)
           <p class="text-ink-muted">Pass mark</p>
           <p class="font-medium text-ink-heading">{{ settings.passMark }}%</p>
         </div>
+      </div>
+    </AppCard>
+
+    <AppCard body-class="">
+      <template #header>
+        <div class="flex items-center justify-between gap-3">
+          <h3 class="text-title text-ink-heading">Students needing attention</h3>
+          <NuxtLink to="/admin/analytics" class="text-sm font-medium text-brand-600 hover:underline dark:text-brand-400">
+            View all &rarr;
+          </NuxtLink>
+        </div>
+      </template>
+      <div v-if="!flaggedPreview.length" class="p-5 text-sm text-ink-muted">No at-risk or declining students right now.</div>
+      <div v-else class="overflow-x-auto">
+        <table class="w-full text-sm">
+          <thead>
+            <tr class="border-b border-line bg-muted text-left text-label text-ink-muted">
+              <th class="px-5 py-3">Student</th>
+              <th class="px-5 py-3">Class</th>
+              <th class="px-5 py-3">Subject</th>
+              <th class="px-5 py-3">Current</th>
+              <th class="px-5 py-3">Status</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="row in flaggedPreview" :key="`${row.student._id}-${row.subjectId}`" class="border-b border-line-soft last:border-0">
+              <td class="px-5 py-3 font-medium text-ink-heading">{{ row.student.firstName }} {{ row.student.lastName }}</td>
+              <td class="px-5 py-3 text-ink">{{ row.className }}</td>
+              <td class="px-5 py-3 text-ink">{{ row.subjectName }}</td>
+              <td class="px-5 py-3 font-mono text-ink">{{ row.current !== null ? row.current.toFixed(1) : '-' }}</td>
+              <td class="px-5 py-3">
+                <AppBadge :color="STATUS_META[row.status].color">{{ STATUS_META[row.status].label }}</AppBadge>
+              </td>
+            </tr>
+          </tbody>
+        </table>
       </div>
     </AppCard>
   </div>

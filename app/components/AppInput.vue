@@ -1,7 +1,7 @@
 <script setup lang="ts">
 const model = defineModel<string | number>()
 
-withDefaults(
+const props = withDefaults(
   defineProps<{
     type?: string
     placeholder?: string
@@ -14,6 +14,10 @@ withDefaults(
   }>(),
   { type: 'text', size: 'md' }
 )
+
+const revealed = ref(false)
+const isPassword = computed(() => props.type === 'password')
+const inputType = computed(() => (isPassword.value && revealed.value ? 'text' : props.type))
 </script>
 
 <template>
@@ -21,7 +25,7 @@ withDefaults(
     <Icon v-if="icon" :name="icon" class="absolute left-3 top-1/2 -translate-y-1/2 size-4 text-ink-subtle" />
     <input
       v-model="model"
-      :type="type"
+      :type="inputType"
       :placeholder="placeholder"
       :disabled="disabled"
       :autofocus="autofocus"
@@ -31,8 +35,18 @@ withDefaults(
       :class="[
         icon ? 'pl-9' : 'pl-3',
         size === 'sm' ? 'py-1.5 text-sm' : size === 'lg' ? 'py-2.5 text-base' : 'py-2 text-sm',
-        'pr-3'
+        isPassword ? 'pr-9' : 'pr-3'
       ]"
     >
+    <button
+      v-if="isPassword"
+      type="button"
+      tabindex="-1"
+      class="absolute right-3 top-1/2 -translate-y-1/2 text-ink-subtle hover:text-ink-muted"
+      :aria-label="revealed ? 'Hide password' : 'Show password'"
+      @click="revealed = !revealed"
+    >
+      <Icon :name="revealed ? 'lucide:eye-off' : 'lucide:eye'" class="size-4" />
+    </button>
   </div>
 </template>

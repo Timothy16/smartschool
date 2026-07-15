@@ -17,7 +17,11 @@ export default defineEventHandler(async (event) => {
 
     if (typeof body?.firstName === 'string') student.firstName = body.firstName.trim()
     if (typeof body?.lastName === 'string') student.lastName = body.lastName.trim()
-    if (typeof body?.email === 'string') student.email = body.email.trim().toLowerCase() || null
+    if (typeof body?.email === 'string') {
+      const email = body.email.trim().toLowerCase() || null
+      if (email) await assertEmailAvailableAcrossRoles(email, 'Student')
+      student.email = email
+    }
     if (typeof body?.admissionNumber === 'string') student.admissionNumber = body.admissionNumber.trim()
     if ('classId' in (body || {})) {
       const classId = typeof body.classId === 'string' && body.classId ? body.classId : null

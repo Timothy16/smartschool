@@ -1,8 +1,7 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'auth' })
 
-const config = useRuntimeConfig()
-console.log(config)
+
 </script>
 
 <template>

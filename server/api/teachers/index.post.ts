@@ -16,6 +16,8 @@ export default defineEventHandler(async (event) => {
       throw createError({ statusCode: 400, message: 'First name, last name, email and password are required.' })
     }
 
+    await assertEmailAvailableAcrossRoles(email, 'Teacher')
+
     const created = await Teacher.create({ firstName, lastName, email, password })
     const { password: _omit, ...teacher } = created.toObject()
 

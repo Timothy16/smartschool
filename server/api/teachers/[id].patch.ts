@@ -16,7 +16,11 @@ export default defineEventHandler(async (event) => {
 
     if (typeof body?.firstName === 'string') teacher.firstName = body.firstName.trim()
     if (typeof body?.lastName === 'string') teacher.lastName = body.lastName.trim()
-    if (typeof body?.email === 'string') teacher.email = body.email.trim().toLowerCase()
+    if (typeof body?.email === 'string') {
+      const email = body.email.trim().toLowerCase()
+      if (email) await assertEmailAvailableAcrossRoles(email, 'Teacher')
+      teacher.email = email
+    }
     if (typeof body?.isActive === 'boolean') teacher.isActive = body.isActive
     if (typeof body?.password === 'string' && body.password) teacher.password = body.password
 

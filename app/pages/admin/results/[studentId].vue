@@ -1,11 +1,13 @@
 <script setup lang="ts">
-definePageMeta({ layout: 'default', role: 'Student' })
+definePageMeta({ layout: 'default', role: 'Admin' })
 
-const auth = useAuthStore()
-const term = ref<string>()
-const session = ref<string>()
+const route = useRoute()
+const studentId = route.params.studentId as string
 
-const { data, status } = await useFetch(`/api/report-card/${auth.user!.id}`, {
+const term = ref(typeof route.query.term === 'string' ? route.query.term : undefined)
+const session = ref(typeof route.query.session === 'string' ? route.query.session : undefined)
+
+const { data, status } = await useFetch(`/api/report-card/${studentId}`, {
   query: computed(() => ({ term: term.value, session: session.value }))
 })
 
@@ -30,9 +32,14 @@ function printCard() {
 <template>
   <div class="space-y-6">
     <div class="flex flex-wrap items-center justify-between gap-3 print:hidden">
-      <div>
-        <h2 class="font-display text-h2 text-ink-heading">My Report Card</h2>
-        <p class="text-sm text-ink-muted">View your results for any completed term.</p>
+      <div class="flex items-center gap-3">
+        <NuxtLink to="/admin/results" class="p-1.5 rounded-md text-ink-muted hover:bg-muted">
+          <Icon name="lucide:arrow-left" class="size-4" />
+        </NuxtLink>
+        <div>
+          <h2 class="font-display text-h2 text-ink-heading">Report Card</h2>
+          <p class="text-sm text-ink-muted">Computed from this student's assessment records.</p>
+        </div>
       </div>
       <div class="flex flex-wrap items-center gap-2">
         <div v-if="periodItems.length > 1" class="w-full sm:w-52">

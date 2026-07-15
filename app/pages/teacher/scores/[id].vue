@@ -12,13 +12,54 @@ const route = useRoute()
 const toast = useToast()
 const assignmentId = route.params.id as string
 
-const { data, status } = await useFetch(`/api/assessments/${assignmentId}`)
+const { data, status, refresh } = await useFetch(`/api/assessments/${assignmentId}`)
 
 const students = computed(() => data.value?.students ?? [])
+const assessments = computed(() => data.value?.assessments ?? [])
+
+// Distinct maxScore values already saved for a type - normally exactly one
+// (the whole class is marked out of the same total), but surfaced explicitly
+// rather than silently picking one when a class ends up with more than one
+// on file (e.g. from a max change made before this lock existed).
+function maxScoresOnFile(type: 'assignment' | 'test' | 'exam') {
+  return [...new Set(assessments.value.filter((a: any) => a.type === type).map((a: any) => a.maxScore))]
+}
+
+const assignmentMaxOnFile = computed(() => maxScoresOnFile('assignment'))
+const testMaxOnFile = computed(() => maxScoresOnFile('test'))
+const examMaxOnFile = computed(() => maxScoresOnFile('exam'))
 
 const assignmentMax = ref<number | null>(100)
 const testMax = ref<number | null>(100)
 const examMax = ref<number | null>(100)
+
+watchEffect(() => {
+  if (assignmentMaxOnFile.value.length) assignmentMax.value = assignmentMaxOnFile.value[0]
+  if (testMaxOnFile.value.length) testMax.value = testMaxOnFile.value[0]
+  if (examMaxOnFile.value.length) examMax.value = examMaxOnFile.value[0]
+})
+
+// Once a type has been scored for anyone in this class this term, its max is
+// locked - changing it after the fact silently reinterprets already-saved
+// raw scores against a new denominator unless every row is re-saved, so it
+// needs an explicit, informed unlock rather than being freely editable.
+const assignmentUnlocked = ref(false)
+const testUnlocked = ref(false)
+const examUnlocked = ref(false)
+
+const assignmentLocked = computed(() => assignmentMaxOnFile.value.length > 0 && !assignmentUnlocked.value)
+const testLocked = computed(() => testMaxOnFile.value.length > 0 && !testUnlocked.value)
+const examLocked = computed(() => examMaxOnFile.value.length > 0 && !examUnlocked.value)
+
+function unlock(type: 'assignment' | 'test' | 'exam') {
+  const confirmed = confirm(
+    `Changing this only affects students you save from now on - anyone already scored keeps their original max unless you re-save their row. Continue?`
+  )
+  if (!confirmed) return
+  if (type === 'assignment') assignmentUnlocked.value = true
+  if (type === 'test') testUnlocked.value = true
+  if (type === 'exam') examUnlocked.value = true
+}
 
 const rows = reactive<Record<string, RowState>>({})
 
@@ -28,21 +69,12 @@ watchEffect(() => {
       rows[student._id] = { assignment: null, test: null, exam: null, saving: false }
     }
   }
-  for (const a of data.value?.assessments ?? []) {
+  for (const a of assessments.value) {
     const row = rows[a.studentId]
     if (!row) continue
-    if (a.type === 'assignment') {
-      row.assignment = a.score
-      assignmentMax.value = a.maxScore
-    }
-    if (a.type === 'test') {
-      row.test = a.score
-      testMax.value = a.maxScore
-    }
-    if (a.type === 'exam') {
-      row.exam = a.score
-      examMax.value = a.maxScore
-    }
+    if (a.type === 'assignment') row.assignment = a.score
+    if (a.type === 'test') row.test = a.score
+    if (a.type === 'exam') row.exam = a.score
   }
 })
 
@@ -60,6 +92,7 @@ async function saveRow(studentId: string) {
     await Promise.all(
       entries.map((entry) => $fetch(`/api/assessments/${assignmentId}`, { method: 'POST', body: { studentId, ...entry } }))
     )
+    await refresh()
     toast.add({ title: 'Scores saved', color: 'success', icon: 'lucide:check-circle' })
   } catch (error: any) {
     toast.add({ title: 'Could not save scores', description: error?.data?.message, color: 'danger' })
@@ -92,14 +125,56 @@ async function saveRow(studentId: string) {
           <h3 class="text-title text-ink-heading">Max scores for this entry</h3>
         </template>
         <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          <AppFormField label="Assignment max">
-            <AppInputNumber v-model="assignmentMax" :min="1" :max="100" />
+          <AppFormField label="Assignment max" :help="assignmentLocked ? 'Locked - already used to score students this term.' : undefined">
+            <div class="flex items-center gap-2">
+              <AppInputNumber v-model="assignmentMax" :min="1" :max="100" :disabled="assignmentLocked" />
+              <button
+                v-if="assignmentLocked"
+                type="button"
+                class="shrink-0 p-2 rounded-md text-ink-muted hover:bg-muted"
+                title="Unlock to change the max for new saves"
+                @click="unlock('assignment')"
+              >
+                <Icon name="lucide:lock" class="size-4" />
+              </button>
+            </div>
+            <p v-if="assignmentMaxOnFile.length > 1" class="mt-1 text-xs text-warning-600 dark:text-warning-500">
+              Scored out of different totals: {{ assignmentMaxOnFile.join(', ') }}. Re-save affected rows to make them consistent.
+            </p>
           </AppFormField>
-          <AppFormField label="Test max">
-            <AppInputNumber v-model="testMax" :min="1" :max="100" />
+          <AppFormField label="Test max" :help="testLocked ? 'Locked - already used to score students this term.' : undefined">
+            <div class="flex items-center gap-2">
+              <AppInputNumber v-model="testMax" :min="1" :max="100" :disabled="testLocked" />
+              <button
+                v-if="testLocked"
+                type="button"
+                class="shrink-0 p-2 rounded-md text-ink-muted hover:bg-muted"
+                title="Unlock to change the max for new saves"
+                @click="unlock('test')"
+              >
+                <Icon name="lucide:lock" class="size-4" />
+              </button>
+            </div>
+            <p v-if="testMaxOnFile.length > 1" class="mt-1 text-xs text-warning-600 dark:text-warning-500">
+              Scored out of different totals: {{ testMaxOnFile.join(', ') }}. Re-save affected rows to make them consistent.
+            </p>
           </AppFormField>
-          <AppFormField label="Exam max">
-            <AppInputNumber v-model="examMax" :min="1" :max="100" />
+          <AppFormField label="Exam max" :help="examLocked ? 'Locked - already used to score students this term.' : undefined">
+            <div class="flex items-center gap-2">
+              <AppInputNumber v-model="examMax" :min="1" :max="100" :disabled="examLocked" />
+              <button
+                v-if="examLocked"
+                type="button"
+                class="shrink-0 p-2 rounded-md text-ink-muted hover:bg-muted"
+                title="Unlock to change the max for new saves"
+                @click="unlock('exam')"
+              >
+                <Icon name="lucide:lock" class="size-4" />
+              </button>
+            </div>
+            <p v-if="examMaxOnFile.length > 1" class="mt-1 text-xs text-warning-600 dark:text-warning-500">
+              Scored out of different totals: {{ examMaxOnFile.join(', ') }}. Re-save affected rows to make them consistent.
+            </p>
           </AppFormField>
         </div>
       </AppCard>

@@ -13,6 +13,8 @@ const navItems = computed(() => {
         { label: 'Teachers', to: '/admin/teachers', icon: 'lucide:user-round' },
         { label: 'Students', to: '/admin/students', icon: 'lucide:users' },
         { label: 'Assignments', to: '/admin/assignments', icon: 'lucide:link-2' },
+        { label: 'Results', to: '/admin/results', icon: 'lucide:file-text' },
+        { label: 'Analytics', to: '/admin/analytics', icon: 'lucide:activity' },
         { label: 'Settings', to: '/admin/settings', icon: 'lucide:settings' }
       ]
     case 'Teacher':
@@ -44,7 +46,7 @@ async function handleLogout() {
 </script>
 
 <template>
-  <div class="flex h-screen overflow-hidden bg-page">
+  <div class="flex h-screen overflow-hidden bg-page print:h-auto print:overflow-visible">
     <!-- Mobile backdrop -->
     <Transition
       enter-active-class="transition-opacity duration-200"
@@ -64,19 +66,19 @@ async function handleLogout() {
     >
       <aside
         v-show="mobileMenuOpen"
-        class="fixed inset-y-0 left-0 z-50 w-64 bg-surface ring-1 ring-line md:hidden"
+        class="fixed inset-y-0 left-0 z-50 w-64 bg-surface ring-1 ring-line md:hidden print:hidden"
       >
         <SidebarNav :nav-items="navItems" @navigate="mobileMenuOpen = false" />
       </aside>
     </Transition>
 
     <!-- Desktop static sidebar -->
-    <aside class="hidden md:flex md:w-64 md:shrink-0 md:flex-col border-r border-line bg-surface">
+    <aside class="hidden md:flex md:w-64 md:shrink-0 md:flex-col border-r border-line bg-surface print:hidden">
       <SidebarNav :nav-items="navItems" />
     </aside>
 
     <div class="flex flex-1 flex-col min-w-0">
-      <header class="h-16 shrink-0 flex items-center justify-between border-b border-line bg-surface px-4">
+      <header class="h-16 shrink-0 flex items-center justify-between border-b border-line bg-surface px-4 print:hidden">
         <div class="flex items-center gap-3">
           <button
             type="button"
@@ -117,7 +119,7 @@ async function handleLogout() {
         </div>
       </header>
 
-      <main class="flex-1 overflow-y-auto p-4 sm:p-6">
+      <main class="flex-1 overflow-y-auto p-4 sm:p-6 print:p-0 print:overflow-visible">
         <slot />
       </main>
     </div>
