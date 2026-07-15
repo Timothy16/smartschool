@@ -17,9 +17,8 @@ async function handleLogout() {
 <template>
   <div class="flex h-full flex-col">
     <div class="h-16 flex items-center gap-2 px-4 border-b border-line">
-      <div class="flex items-center justify-center size-8 rounded-lg bg-brand-50 ring-1 ring-brand-600/20 dark:bg-brand-900/40">
-        <Icon name="lucide:graduation-cap" class="size-5 text-brand-600 dark:text-brand-400" />
-      </div>
+      <img src="/logo.png" alt="Smart School" class="size-8 rounded-lg">
+
       <span class="font-display font-semibold text-ink-heading">Smart School</span>
     </div>
 

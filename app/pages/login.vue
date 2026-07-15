@@ -30,9 +30,8 @@ async function handleSubmit() {
   <AppCard class="shadow-2xl shadow-brand-500/10 backdrop-blur-sm bg-surface/90">
     <template #header>
       <div class="flex flex-col items-center gap-3 py-2">
-        <div class="flex items-center justify-center size-14 rounded-2xl bg-brand-50 ring-1 ring-brand-600/20 dark:bg-brand-900/40">
-          <Icon name="lucide:graduation-cap" class="size-8 text-brand-600 dark:text-brand-400" />
-        </div>
+        <img src="/logo.png" alt="Smart School" class="size-14 rounded-2xl">
+
         <div class="text-center">
           <h1 class="font-display text-h3 text-ink-heading">Welcome back</h1>
           <p class="text-sm text-ink-muted mt-1">Sign in to Smart School to continue</p>
