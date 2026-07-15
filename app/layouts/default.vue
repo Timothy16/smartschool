@@ -119,7 +119,7 @@ async function handleLogout() {
         </div>
       </header>
 
-      <main class="flex-1 overflow-y-auto p-4 sm:p-6 print:p-0 print:overflow-visible">
+      <main class="relative flex-1 overflow-y-auto p-4 sm:p-6 print:p-0 print:overflow-visible">
         <slot />
       </main>
     </div>

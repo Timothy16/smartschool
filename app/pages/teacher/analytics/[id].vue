@@ -4,7 +4,7 @@ definePageMeta({ layout: 'default', role: 'Teacher' })
 const route = useRoute()
 const assignmentId = route.params.id as string
 
-const { data, status } = await useFetch(`/api/teacher/analytics/${assignmentId}`)
+const { data, status } = useFetch(`/api/teacher/analytics/${assignmentId}`)
 
 const students = computed(() => data.value?.students ?? [])
 
@@ -22,7 +22,24 @@ function countOf(key: string) {
 
 <template>
   <div class="space-y-6">
-    <div v-if="status === 'pending'" class="text-sm text-ink-subtle">Loading…</div>
+    <template v-if="status === 'pending'">
+      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+        <AppCard v-for="i in 3" :key="i">
+          <AppSkeleton width="4rem" height="0.75rem" class="mb-2" />
+          <AppSkeleton width="2.5rem" height="1.75rem" />
+        </AppCard>
+      </div>
+      <AppCard body-class="">
+        <template #header>
+          <AppSkeleton width="8rem" height="1rem" />
+        </template>
+        <table class="w-full text-sm">
+          <tbody>
+            <TableSkeletonRows :columns="4" />
+          </tbody>
+        </table>
+      </AppCard>
+    </template>
 
     <template v-else-if="data">
       <div class="flex flex-wrap items-center justify-between gap-3">

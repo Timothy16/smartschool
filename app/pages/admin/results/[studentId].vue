@@ -7,7 +7,7 @@ const studentId = route.params.studentId as string
 const term = ref(typeof route.query.term === 'string' ? route.query.term : undefined)
 const session = ref(typeof route.query.session === 'string' ? route.query.session : undefined)
 
-const { data, status } = await useFetch(`/api/report-card/${studentId}`, {
+const { data, status } = useFetch(`/api/report-card/${studentId}`, {
   query: computed(() => ({ term: term.value, session: session.value }))
 })
 
@@ -49,7 +49,15 @@ function printCard() {
       </div>
     </div>
 
-    <div v-if="status === 'pending'" class="text-sm text-ink-subtle">Loading…</div>
+    <AppCard v-if="status === 'pending'">
+      <div class="space-y-3">
+        <AppSkeleton width="12rem" height="1.25rem" />
+        <AppSkeleton width="8rem" height="0.875rem" />
+        <div class="pt-3 space-y-2">
+          <AppSkeleton v-for="i in 6" :key="i" height="1.5rem" />
+        </div>
+      </div>
+    </AppCard>
     <ReportCard v-else-if="data" :data="data" />
   </div>
 </template>

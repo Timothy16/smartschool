@@ -3,7 +3,7 @@ definePageMeta({ layout: 'default', role: 'Admin' })
 
 const toast = useToast()
 
-const { data, refresh, status } = await useFetch('/api/settings')
+const { data, refresh, status } = useFetch('/api/settings')
 
 const termOptions = ['First', 'Second', 'Third']
 
@@ -73,6 +73,17 @@ async function handleSave() {
       <h2 class="font-display text-h2 text-ink-heading">Settings</h2>
       <p class="text-sm text-ink-muted">Academic session, grading and weighting configuration.</p>
     </div>
+
+    <template v-if="status === 'pending'">
+      <AppCard v-for="i in 3" :key="i">
+        <AppSkeleton width="40%" height="1rem" class="mb-4" />
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <AppSkeleton height="2.5rem" />
+          <AppSkeleton height="2.5rem" />
+          <AppSkeleton height="2.5rem" />
+        </div>
+      </AppCard>
+    </template>
 
     <AppCard v-if="status !== 'pending'">
       <template #header>

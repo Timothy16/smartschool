@@ -12,7 +12,7 @@ const route = useRoute()
 const toast = useToast()
 const assignmentId = route.params.id as string
 
-const { data, status, refresh } = await useFetch(`/api/assessments/${assignmentId}`)
+const { data, status, refresh } = useFetch(`/api/assessments/${assignmentId}`)
 
 const students = computed(() => data.value?.students ?? [])
 const assessments = computed(() => data.value?.assessments ?? [])
@@ -104,7 +104,25 @@ async function saveRow(studentId: string) {
 
 <template>
   <div class="space-y-6">
-    <div v-if="status === 'pending'" class="text-sm text-ink-subtle">Loading…</div>
+    <template v-if="status === 'pending'">
+      <AppCard>
+        <template #header>
+          <AppSkeleton width="10rem" height="1rem" />
+        </template>
+        <div class="grid grid-cols-1 sm:grid-cols-3 gap-4">
+          <AppSkeleton height="2.5rem" />
+          <AppSkeleton height="2.5rem" />
+          <AppSkeleton height="2.5rem" />
+        </div>
+      </AppCard>
+      <AppCard body-class="">
+        <table class="w-full text-sm">
+          <tbody>
+            <TableSkeletonRows :columns="5" />
+          </tbody>
+        </table>
+      </AppCard>
+    </template>
 
     <template v-else-if="data">
       <div class="flex flex-wrap items-center justify-between gap-3">

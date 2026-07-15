@@ -1,8 +1,8 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default', role: 'Admin' })
 
-const { data: classesData } = await useFetch('/api/classes')
-const { data: settingsData } = await useFetch('/api/settings')
+const { data: classesData } = useFetch('/api/classes')
+const { data: settingsData } = useFetch('/api/settings')
 
 const classId = ref('')
 const term = ref('')
@@ -27,7 +27,7 @@ const termOptions = [
   { label: 'Third Term', value: 'Third' }
 ]
 
-const { data, status, refresh } = await useFetch(
+const { data, status, refresh } = useFetch(
   () => (classId.value ? `/api/report-card/class/${classId.value}` : ''),
   { query: computed(() => ({ term: term.value, session: session.value })), immediate: !!classId.value }
 )
@@ -75,9 +75,7 @@ const students = computed(() => data.value?.students ?? [])
             </tr>
           </thead>
           <tbody>
-            <tr v-if="status === 'pending'">
-              <td colspan="7" class="px-5 py-8 text-center text-ink-subtle">Loading…</td>
-            </tr>
+            <TableSkeletonRows v-if="status === 'pending'" :columns="7" />
             <tr v-else-if="!students.length">
               <td colspan="7" class="px-5 py-8 text-center text-ink-subtle">No active students in this class.</td>
             </tr>

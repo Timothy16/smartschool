@@ -13,7 +13,7 @@ export default defineNuxtConfig({
     classSuffix: ''
   },
   app: {
-    pageTransition: { name: 'page', mode: 'out-in' },
+    pageTransition: { name: 'page' },
     head: {
       link: [
         { rel: 'preconnect', href: 'https://fonts.googleapis.com' },

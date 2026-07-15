@@ -3,9 +3,9 @@ definePageMeta({ layout: 'default', role: 'Admin' })
 
 const toast = useToast()
 
-const { data, refresh, status } = await useFetch('/api/classes')
-const { data: teachersData } = await useFetch('/api/teachers')
-const { data: settingsData } = await useFetch('/api/settings')
+const { data, refresh, status } = useFetch('/api/classes')
+const { data: teachersData } = useFetch('/api/teachers')
+const { data: settingsData } = useFetch('/api/settings')
 
 const classes = computed(() => data.value?.classes ?? [])
 const teacherOptions = computed(() => [
@@ -115,9 +115,7 @@ async function handleDelete() {
             </tr>
           </thead>
           <tbody>
-            <tr v-if="status === 'pending'">
-              <td colspan="4" class="px-5 py-8 text-center text-ink-subtle">Loading…</td>
-            </tr>
+            <TableSkeletonRows v-if="status === 'pending'" :columns="4" />
             <tr v-else-if="!classes.length">
               <td colspan="4" class="px-5 py-8 text-center text-ink-subtle">No classes yet.</td>
             </tr>

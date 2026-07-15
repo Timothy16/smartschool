@@ -170,7 +170,11 @@
 
 .page-enter-active,
 .page-leave-active {
-  transition: opacity 0.15s ease, transform 0.15s ease;
+  transition: opacity 0.1s ease, transform 0.1s ease;
+}
+.page-leave-active {
+  position: absolute;
+  inset: 0;
 }
 .page-enter-from,
 .page-leave-to {

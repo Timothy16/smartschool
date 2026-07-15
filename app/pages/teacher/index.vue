@@ -3,7 +3,7 @@ definePageMeta({ layout: 'default', role: 'Teacher' })
 
 const auth = useAuthStore()
 
-const { data, status } = await useFetch('/api/teacher/assignments')
+const { data, status } = useFetch('/api/teacher/assignments')
 const assignments = computed(() => data.value?.assignments ?? [])
 </script>
 
@@ -14,7 +14,22 @@ const assignments = computed(() => data.value?.assignments ?? [])
       <p class="text-sm text-ink-muted">Your assigned classes and subjects.</p>
     </div>
 
-    <div v-if="status === 'pending'" class="text-sm text-ink-subtle">Loading…</div>
+    <div v-if="status === 'pending'" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <AppCard v-for="i in 3" :key="i">
+        <div class="flex items-start justify-between gap-3">
+          <div class="flex-1 space-y-2">
+            <AppSkeleton width="60%" height="1rem" />
+            <AppSkeleton width="80%" height="0.75rem" />
+          </div>
+          <AppSkeleton width="2.25rem" height="2.25rem" rounded="rounded-lg" />
+        </div>
+        <AppSkeleton width="4rem" height="1.25rem" class="mt-3" />
+        <div class="flex gap-2 mt-4">
+          <AppSkeleton height="2rem" />
+          <AppSkeleton height="2rem" />
+        </div>
+      </AppCard>
+    </div>
 
     <AppCard v-else-if="!assignments.length">
       <p class="text-ink-muted">You don't have any class/subject assignments yet - ask your admin to assign you one.</p>

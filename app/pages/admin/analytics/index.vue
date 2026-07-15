@@ -1,8 +1,8 @@
 <script setup lang="ts">
 definePageMeta({ layout: 'default', role: 'Admin' })
 
-const { data: schoolData, status: schoolStatus } = await useFetch('/api/analytics/school')
-const { data: assignmentsData } = await useFetch('/api/assignments')
+const { data: schoolData, status: schoolStatus } = useFetch('/api/analytics/school')
+const { data: assignmentsData } = useFetch('/api/assignments')
 
 const assignmentOptions = computed(() =>
   (assignmentsData.value?.assignments ?? []).map((a: any) => ({
@@ -48,7 +48,24 @@ const STATUS_META: Record<string, { label: string; color: 'danger' | 'warning' |
       <p class="text-sm text-ink-muted">School-wide at-risk and declining flags, computed from score trends.</p>
     </div>
 
-    <div v-if="schoolStatus === 'pending'" class="text-sm text-ink-subtle">Loading…</div>
+    <template v-if="schoolStatus === 'pending'">
+      <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
+        <AppCard v-for="i in 4" :key="i">
+          <AppSkeleton width="4rem" height="0.75rem" class="mb-2" />
+          <AppSkeleton width="2.5rem" height="1.75rem" />
+        </AppCard>
+      </div>
+      <AppCard body-class="">
+        <template #header>
+          <AppSkeleton width="10rem" height="1rem" />
+        </template>
+        <table class="w-full text-sm">
+          <tbody>
+            <TableSkeletonRows :columns="5" />
+          </tbody>
+        </table>
+      </AppCard>
+    </template>
 
     <template v-else-if="summary">
       <div class="grid grid-cols-2 lg:grid-cols-4 gap-4">
