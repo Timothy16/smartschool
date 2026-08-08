@@ -29,6 +29,7 @@ export default defineNuxtConfig({
     mongodbUri: process.env.MONGODB_URI || '',
     seedSecret: process.env.SEED_SECRET || '',
     sessionSecret: process.env.SESSION_SECRET || '',
+    deepseekApiKey: process.env.DEEPSEEK_API_KEY || '',
     public: {
       appUrl: process.env.APP_URL || 'http://localhost:3000'
     }

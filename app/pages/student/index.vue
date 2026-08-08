@@ -25,6 +25,15 @@ const periodValue = computed({
 function printCard() {
   window.print()
 }
+
+const resolvedTerm = computed(() => term.value ?? data.value?.term)
+const resolvedSession = computed(() => session.value ?? data.value?.session)
+
+const { data: analysisData, status: analysisStatus } = useFetch(`/api/ai-analysis/${auth.user!.id}`, {
+  query: computed(() => ({ term: resolvedTerm.value, session: resolvedSession.value }))
+})
+
+const analysis = computed(() => analysisData.value?.analysis ?? null)
 </script>
 
 <template>
@@ -52,5 +61,57 @@ function printCard() {
       </div>
     </AppCard>
     <ReportCard v-else-if="data" :data="data" />
+
+    <AppCard v-if="analysisStatus !== 'pending' && analysis" class="print:hidden">
+      <template #header>
+        <h3 class="text-title text-ink-heading">Smart Analysis</h3>
+        <p class="text-sm text-ink-muted">Insights from your teachers and school admin for this term.</p>
+      </template>
+
+      <div class="space-y-6">
+        <p v-if="analysis.overallSummary" class="text-sm text-ink">{{ analysis.overallSummary }}</p>
+
+        <div class="space-y-5">
+          <div v-for="subject in analysis.subjects" :key="subject.code" class="border-t border-line-soft pt-5 first:border-0 first:pt-0">
+            <h4 class="font-display text-title text-ink-heading">{{ subject.name }}</h4>
+            <p class="mt-1 text-sm text-ink">{{ subject.performanceSummary }}</p>
+
+            <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm">
+              <div>
+                <p class="text-label text-ink-muted mb-1">Strengths</p>
+                <ul class="list-disc list-inside space-y-0.5 text-ink">
+                  <li v-for="(item, i) in subject.strengths" :key="i">{{ item }}</li>
+                </ul>
+              </div>
+              <div>
+                <p class="text-label text-ink-muted mb-1">Areas to improve</p>
+                <ul class="list-disc list-inside space-y-0.5 text-ink">
+                  <li v-for="(item, i) in subject.weaknesses" :key="i">{{ item }}</li>
+                </ul>
+              </div>
+              <div>
+                <p class="text-label text-ink-muted mb-1">Recommendations</p>
+                <ul class="list-disc list-inside space-y-0.5 text-ink">
+                  <li v-for="(item, i) in subject.recommendations" :key="i">{{ item }}</li>
+                </ul>
+              </div>
+              <div>
+                <p class="text-label text-ink-muted mb-1">Topics to review</p>
+                <ul class="list-disc list-inside space-y-0.5 text-ink">
+                  <li v-for="(item, i) in subject.topicsToReview" :key="i">{{ item }}</li>
+                </ul>
+              </div>
+            </div>
+
+            <div v-if="subject.suggestedBooks?.length" class="mt-3">
+              <p class="text-label text-ink-muted mb-1">Suggested books</p>
+              <div class="flex flex-wrap gap-1.5">
+                <AppBadge v-for="(book, i) in subject.suggestedBooks" :key="i" color="info">{{ book }}</AppBadge>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </AppCard>
   </div>
 </template>

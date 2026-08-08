@@ -18,6 +18,24 @@ const STATUS_META: Record<string, { label: string; color: 'danger' | 'warning' |
 function countOf(key: string) {
   return students.value.filter((s: any) => s.status === key).length
 }
+
+const insightsOpen = ref(false)
+const insightsLoading = ref(false)
+const insightsStudent = ref<any>(null)
+const insightsAnalysis = ref<any>(null)
+
+async function viewInsights(row: any) {
+  insightsStudent.value = row.student
+  insightsOpen.value = true
+  insightsLoading.value = true
+  insightsAnalysis.value = null
+  try {
+    const res = await $fetch(`/api/ai-analysis/${row.student._id}`)
+    insightsAnalysis.value = res.analysis
+  } finally {
+    insightsLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -80,6 +98,7 @@ function countOf(key: string) {
                 <th class="px-5 py-3">Trend</th>
                 <th class="px-5 py-3">Current</th>
                 <th class="px-5 py-3">Status</th>
+                <th class="px-5 py-3"></th>
               </tr>
             </thead>
             <tbody>
@@ -95,11 +114,59 @@ function countOf(key: string) {
                 <td class="px-5 py-3">
                   <AppBadge :color="STATUS_META[row.status].color">{{ STATUS_META[row.status].label }}</AppBadge>
                 </td>
+                <td class="px-5 py-3 text-right">
+                  <AppButton variant="ghost" size="sm" icon="lucide:sparkles" @click="viewInsights(row)">Insights</AppButton>
+                </td>
               </tr>
             </tbody>
           </table>
         </div>
       </AppCard>
     </template>
+
+    <AppModal v-model:open="insightsOpen" title="Smart Analysis">
+      <template #body>
+        <div v-if="insightsLoading" class="space-y-2">
+          <AppSkeleton height="1rem" />
+          <AppSkeleton height="1rem" />
+          <AppSkeleton height="1rem" />
+        </div>
+        <div v-else-if="!insightsAnalysis" class="text-sm text-ink-muted">
+          No Smart Analysis has been published for {{ insightsStudent?.firstName }} yet.
+        </div>
+        <div v-else class="space-y-5">
+          <div v-for="subject in insightsAnalysis.subjects" :key="subject.code">
+            <h4 class="font-display text-title text-ink-heading">{{ subject.name }}</h4>
+            <p class="mt-1 text-sm text-ink">{{ subject.performanceSummary }}</p>
+            <div class="mt-2 space-y-2 text-sm">
+              <div>
+                <p class="text-label text-ink-muted mb-1">Strengths</p>
+                <ul class="list-disc list-inside text-ink">
+                  <li v-for="(item, i) in subject.strengths" :key="i">{{ item }}</li>
+                </ul>
+              </div>
+              <div>
+                <p class="text-label text-ink-muted mb-1">Areas to improve</p>
+                <ul class="list-disc list-inside text-ink">
+                  <li v-for="(item, i) in subject.weaknesses" :key="i">{{ item }}</li>
+                </ul>
+              </div>
+              <div>
+                <p class="text-label text-ink-muted mb-1">Recommendations</p>
+                <ul class="list-disc list-inside text-ink">
+                  <li v-for="(item, i) in subject.recommendations" :key="i">{{ item }}</li>
+                </ul>
+              </div>
+              <div>
+                <p class="text-label text-ink-muted mb-1">Topics to review</p>
+                <ul class="list-disc list-inside text-ink">
+                  <li v-for="(item, i) in subject.topicsToReview" :key="i">{{ item }}</li>
+                </ul>
+              </div>
+            </div>
+          </div>
+        </div>
+      </template>
+    </AppModal>
   </div>
 </template>
